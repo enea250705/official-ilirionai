@@ -5,7 +5,7 @@ import type { NextRequest } from 'next/server';
 import { authConfig } from '@/app/(auth)/auth.config';
 
 // Auth middleware
-const auth = NextAuth(authConfig).auth;
+const { auth } = NextAuth(authConfig);
 
 // API error handling middleware
 async function apiMiddleware(request: NextRequest) {
