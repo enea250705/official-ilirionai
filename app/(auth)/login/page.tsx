@@ -1,63 +1,101 @@
 'use client';
 
 import Link from 'next/link';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useActionState, useEffect, useState } from 'react';
-import { toast } from '@/components/toast';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
-import { AuthForm } from '@/components/auth-form';
-import { SubmitButton } from '@/components/submit-button';
-
-import { login, type LoginActionState } from '../actions';
-
-export default function Page() {
+export default function LoginPage() {
   const router = useRouter();
-
   const [email, setEmail] = useState('');
-  const [isSuccessful, setIsSuccessful] = useState(false);
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const [state, formAction] = useActionState<LoginActionState, FormData>(
-    login,
-    {
-      status: 'idle',
-    },
-  );
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
 
-  useEffect(() => {
-    if (state.status === 'failed') {
-      toast({
-        type: 'error',
-        description: 'Kredenciale të pavlefshme!',
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
       });
-    } else if (state.status === 'invalid_data') {
-      toast({
-        type: 'error',
-        description: 'Dështoi validimi i të dhënave tuaja!',
-      });
-    } else if (state.status === 'success') {
-      setIsSuccessful(true);
-      router.refresh();
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Ndodhi një gabim gjatë hyrjes');
+      }
+
+      // Successful login
+      router.push('/');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Ndodhi një gabim gjatë hyrjes');
+    } finally {
+      setLoading(false);
     }
-  }, [state.status]);
-
-  const handleSubmit = (formData: FormData) => {
-    setEmail(formData.get('email') as string);
-    formAction(formData);
   };
 
   return (
-    <div className="flex h-dvh w-screen items-start pt-12 md:pt-0 md:items-center justify-center bg-background">
-      <div className="w-full max-w-md overflow-hidden rounded-2xl flex flex-col gap-12">
-        <div className="flex flex-col items-center justify-center gap-2 px-4 text-center sm:px-16">
-          <h3 className="text-xl font-semibold dark:text-zinc-50">Hyr në llogari</h3>
-          <p className="text-sm text-gray-500 dark:text-zinc-400">
+    <div className="flex h-dvh w-screen items-center justify-center bg-background">
+      <div className="w-full max-w-md overflow-hidden rounded-2xl p-8 shadow-lg">
+        <div className="mb-8 text-center">
+          <h1 className="text-2xl font-bold dark:text-zinc-50">Hyr në llogari</h1>
+          <p className="mt-2 text-sm text-gray-500 dark:text-zinc-400">
             Përdor emailin dhe fjalëkalimin për të hyrë
           </p>
         </div>
-        <AuthForm action={handleSubmit} defaultEmail={email}>
-          <SubmitButton isSuccessful={isSuccessful}>Hyr</SubmitButton>
-          <p className="text-center text-sm text-gray-600 mt-4 dark:text-zinc-400">
-            {"Nuk ke llogari? "}
+
+        {error && (
+          <div className="mb-4 rounded-md bg-red-50 p-3 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="email">Adresa e Emailit</Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="perdorues@shembull.com"
+              required
+              autoFocus
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="password">Fjalëkalimi</Label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={loading}
+          >
+            {loading ? 'Duke hyrë...' : 'Hyr'}
+          </Button>
+        </form>
+
+        <div className="mt-6 text-center text-sm">
+          <p className="text-gray-600 dark:text-zinc-400">
+            Nuk ke llogari?{' '}
             <Link
               href="/register"
               className="font-semibold text-gray-800 hover:underline dark:text-zinc-200"
@@ -66,7 +104,7 @@ export default function Page() {
             </Link>
             {' falas.'}
           </p>
-        </AuthForm>
+        </div>
       </div>
     </div>
   );
