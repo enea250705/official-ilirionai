@@ -1,9 +1,8 @@
-import NextAuth from 'next-auth';
+import { withAuth } from 'next-auth/middleware';
 
-import { authConfig } from '@/app/(auth)/auth.config';
+// This function bypasses auth checks and makes all routes accessible
+export default function middleware() {
+  return;
+}
 
-export default NextAuth(authConfig).auth;
-
-export const config = {
-  matcher: ['/', '/:id', '/api/:path*', '/login', '/register'],
-};
+export const config = { matcher: [] };

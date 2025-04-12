@@ -1,13 +1,21 @@
 import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 
-import { auth } from '@/app/(auth)/auth';
 import { Chat } from '@/components/chat';
 import { getChatById, getMessagesByChatId } from '@/lib/db/queries';
 import { DataStreamHandler } from '@/components/data-stream-handler';
 import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
 import { DBMessage } from '@/lib/db/schema';
 import { Attachment, UIMessage } from 'ai';
+
+// Mock user session
+const mockSession = {
+  user: {
+    id: 'ilirion-user-id',
+    name: 'Ilirion User',
+    email: 'user@ilirionai.al'
+  }
+};
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -18,17 +26,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
     notFound();
   }
 
-  const session = await auth();
-
-  if (chat.visibility === 'private') {
-    if (!session || !session.user) {
-      return notFound();
-    }
-
-    if (session.user.id !== chat.userId) {
-      return notFound();
-    }
-  }
+  const session = mockSession;
 
   const messagesFromDb = await getMessagesByChatId({
     id,
@@ -58,7 +56,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
           initialMessages={convertToUIMessages(messagesFromDb)}
           selectedChatModel={DEFAULT_CHAT_MODEL}
           selectedVisibilityType={chat.visibility}
-          isReadonly={session?.user?.id !== chat.userId}
+          isReadonly={false}
         />
         <DataStreamHandler id={id} />
       </>
@@ -72,7 +70,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
         initialMessages={convertToUIMessages(messagesFromDb)}
         selectedChatModel={chatModelFromCookie.value}
         selectedVisibilityType={chat.visibility}
-        isReadonly={session?.user?.id !== chat.userId}
+        isReadonly={false}
       />
       <DataStreamHandler id={id} />
     </>

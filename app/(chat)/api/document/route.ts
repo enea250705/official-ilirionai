@@ -1,10 +1,18 @@
-import { auth } from '@/app/(auth)/auth';
 import { ArtifactKind } from '@/components/artifact';
 import {
   deleteDocumentsByIdAfterTimestamp,
   getDocumentsById,
   saveDocument,
 } from '@/lib/db/queries';
+
+// Mock user session
+const mockSession = {
+  user: {
+    id: 'ilirion-user-id',
+    name: 'Ilirion User',
+    email: 'user@ilirionai.al'
+  }
+};
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -14,11 +22,7 @@ export async function GET(request: Request) {
     return new Response('Missing id', { status: 400 });
   }
 
-  const session = await auth();
-
-  if (!session || !session.user) {
-    return new Response('Unauthorized', { status: 401 });
-  }
+  const session = mockSession;
 
   const documents = await getDocumentsById({ id });
 
@@ -26,10 +30,6 @@ export async function GET(request: Request) {
 
   if (!document) {
     return new Response('Not Found', { status: 404 });
-  }
-
-  if (document.userId !== session.user.id) {
-    return new Response('Unauthorized', { status: 401 });
   }
 
   return Response.json(documents, { status: 200 });
@@ -43,11 +43,7 @@ export async function POST(request: Request) {
     return new Response('Missing id', { status: 400 });
   }
 
-  const session = await auth();
-
-  if (!session) {
-    return new Response('Unauthorized', { status: 401 });
-  }
+  const session = mockSession;
 
   const {
     content,
@@ -56,19 +52,15 @@ export async function POST(request: Request) {
   }: { content: string; title: string; kind: ArtifactKind } =
     await request.json();
 
-  if (session.user?.id) {
-    const document = await saveDocument({
-      id,
-      content,
-      title,
-      kind,
-      userId: session.user.id,
-    });
+  const document = await saveDocument({
+    id,
+    content,
+    title,
+    kind,
+    userId: session.user.id,
+  });
 
-    return Response.json(document, { status: 200 });
-  }
-
-  return new Response('Unauthorized', { status: 401 });
+  return Response.json(document, { status: 200 });
 }
 
 export async function PATCH(request: Request) {
@@ -81,19 +73,11 @@ export async function PATCH(request: Request) {
     return new Response('Missing id', { status: 400 });
   }
 
-  const session = await auth();
-
-  if (!session || !session.user) {
-    return new Response('Unauthorized', { status: 401 });
-  }
+  const session = mockSession;
 
   const documents = await getDocumentsById({ id });
 
   const [document] = documents;
-
-  if (document.userId !== session.user.id) {
-    return new Response('Unauthorized', { status: 401 });
-  }
 
   await deleteDocumentsByIdAfterTimestamp({
     id,

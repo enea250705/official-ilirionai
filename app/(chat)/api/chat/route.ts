@@ -40,11 +40,14 @@ export async function POST(request: Request) {
       selectedChatModel: string;
     } = await request.json();
 
-    const session = await auth();
-
-    if (!session || !session.user || !session.user.id) {
-      return new Response('Unauthorized', { status: 401 });
-    }
+    // Mock session with a static user ID
+    const session = {
+      user: {
+        id: 'ilirion-user-id',
+        name: 'Ilirion User',
+        email: 'user@ilirionai.al'
+      }
+    };
 
     const userMessage = getMostRecentUserMessage(messages);
 
@@ -60,10 +63,6 @@ export async function POST(request: Request) {
       });
 
       await saveChat({ id, userId: session.user.id, title });
-    } else {
-      if (chat.userId !== session.user.id) {
-        return new Response('Unauthorized', { status: 401 });
-      }
     }
 
     await saveMessages({
@@ -173,18 +172,17 @@ export async function DELETE(request: Request) {
     return new Response('Not Found', { status: 404 });
   }
 
-  const session = await auth();
-
-  if (!session || !session.user) {
-    return new Response('Unauthorized', { status: 401 });
-  }
+  // Mock session with a static user ID
+  const session = {
+    user: {
+      id: 'ilirion-user-id',
+      name: 'Ilirion User',
+      email: 'user@ilirionai.al'
+    }
+  };
 
   try {
     const chat = await getChatById({ id });
-
-    if (chat.userId !== session.user.id) {
-      return new Response('Unauthorized', { status: 401 });
-    }
 
     await deleteChatById({ id });
 

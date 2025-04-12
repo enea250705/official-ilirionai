@@ -1,6 +1,14 @@
-import { auth } from '@/app/(auth)/auth';
 import { NextRequest } from 'next/server';
 import { getChatsByUserId } from '@/lib/db/queries';
+
+// Mock user session
+const mockSession = {
+  user: {
+    id: 'ilirion-user-id',
+    name: 'Ilirion User',
+    email: 'user@ilirionai.al'
+  }
+};
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
@@ -16,11 +24,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const session = await auth();
-
-  if (!session?.user?.id) {
-    return Response.json('Unauthorized!', { status: 401 });
-  }
+  const session = mockSession;
 
   try {
     const chats = await getChatsByUserId({
