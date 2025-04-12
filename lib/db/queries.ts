@@ -24,26 +24,33 @@ import { ArtifactKind } from '@/components/artifact';
 // https://authjs.dev/reference/adapter/drizzle
 
 // biome-ignore lint: Forbidden non-null assertion.
-const client = postgres(process.env.POSTGRES_URL!);
+const client = postgres(process.env.POSTGRES_URL || '');
 const db = drizzle(client);
 
 export async function getUser(email: string): Promise<Array<User>> {
   try {
+    if (!process.env.POSTGRES_URL) {
+      console.error('POSTGRES_URL is not defined');
+      return [];
+    }
     return await db.select().from(user).where(eq(user.email, email));
   } catch (error) {
-    console.error('Failed to get user from database');
-    throw error;
+    console.error('Failed to get user from database', error);
+    return [];
   }
 }
 
 export async function createUser(email: string, password: string) {
-  const salt = genSaltSync(10);
-  const hash = hashSync(password, salt);
-
   try {
+    if (!process.env.POSTGRES_URL) {
+      console.error('POSTGRES_URL is not defined');
+      throw new Error('Database connection not configured');
+    }
+    const salt = genSaltSync(10);
+    const hash = hashSync(password, salt);
     return await db.insert(user).values({ email, password: hash });
   } catch (error) {
-    console.error('Failed to create user in database');
+    console.error('Failed to create user in database', error);
     throw error;
   }
 }

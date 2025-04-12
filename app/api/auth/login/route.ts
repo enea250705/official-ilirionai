@@ -5,7 +5,19 @@ import { signIn } from '@/app/(auth)/auth';
 
 export async function POST(request: Request) {
   try {
-    const { email, password } = await request.json();
+    // Parse request body safely
+    let email, password;
+    try {
+      const body = await request.json();
+      email = body.email;
+      password = body.password;
+    } catch (e) {
+      console.error('Failed to parse request body:', e);
+      return NextResponse.json(
+        { message: 'Kërkesë e pavlefshme' },
+        { status: 400 }
+      );
+    }
 
     if (!email || !password) {
       return NextResponse.json(
@@ -32,12 +44,20 @@ export async function POST(request: Request) {
       );
     }
 
-    // Sign in the user
-    await signIn('credentials', {
-      email,
-      password,
-      redirect: false,
-    });
+    try {
+      // Sign in the user
+      await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      });
+    } catch (signInError) {
+      console.error('Sign in error:', signInError);
+      return NextResponse.json(
+        { message: 'Ndodhi një gabim me autentikimin' },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json(
       { message: 'Hyrja u krye me sukses', user: { email: users[0].email, id: users[0].id } },

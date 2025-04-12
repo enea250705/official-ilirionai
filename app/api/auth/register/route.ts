@@ -10,7 +10,17 @@ const registerSchema = z.object({
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    // Parse request body safely
+    let body;
+    try {
+      body = await request.json();
+    } catch (e) {
+      console.error('Failed to parse request body:', e);
+      return NextResponse.json(
+        { message: 'Kërkesë e pavlefshme' },
+        { status: 400 }
+      );
+    }
     
     // Validate input
     const result = registerSchema.safeParse(body);
@@ -36,8 +46,16 @@ export async function POST(request: Request) {
       );
     }
 
-    // Create new user
-    await createUser(email, password);
+    try {
+      // Create new user
+      await createUser(email, password);
+    } catch (createError) {
+      console.error('User creation error:', createError);
+      return NextResponse.json(
+        { message: 'Ndodhi një gabim gjatë krijimit të llogarisë' },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json(
       { message: 'Regjistrimi u krye me sukses' },

@@ -28,10 +28,16 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        console.error('JSON parsing error:', jsonError);
+        throw new Error('Ndodhi një gabim gjatë përpunimit të përgjigjes nga serveri');
+      }
 
       if (!response.ok) {
-        throw new Error(data.message || 'Ndodhi një gabim gjatë hyrjes');
+        throw new Error(data?.message || 'Ndodhi një gabim gjatë hyrjes');
       }
 
       // Successful login
