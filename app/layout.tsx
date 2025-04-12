@@ -7,8 +7,8 @@ import './globals.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://chat.vercel.ai'),
-  title: 'Next.js Chatbot Template',
-  description: 'Next.js chatbot template using the AI SDK.',
+  title: 'Ilirion AI - Asistenti Shqiptar',
+  description: 'Ilirion AI, asistenti i parë artificial që flet vetëm shqip, pasardhësi i ilirëve të lashtë.',
 };
 
 export const viewport = {
@@ -68,6 +68,7 @@ export default async function RootLayout({
             __html: THEME_COLOR_SCRIPT,
           }}
         />
+        <link rel="icon" href="/albania_flag.svg" />
       </head>
       <body className="antialiased">
         <ThemeProvider

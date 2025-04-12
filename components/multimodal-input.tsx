@@ -149,7 +149,7 @@ function PureMultimodalInput({
       const { error } = await response.json();
       toast.error(error);
     } catch (error) {
-      toast.error('Failed to upload file, please try again!');
+      toast.error('Ngarkimi i file-it dështoi, provoni përsëri!');
     }
   };
 
@@ -222,7 +222,7 @@ function PureMultimodalInput({
       <Textarea
         data-testid="multimodal-input"
         ref={textareaRef}
-        placeholder="Send a message..."
+        placeholder="Shkruaj një mesazh..."
         value={input}
         onChange={handleInput}
         className={cx(
@@ -240,7 +240,7 @@ function PureMultimodalInput({
             event.preventDefault();
 
             if (status !== 'ready') {
-              toast.error('Please wait for the model to finish its response!');
+              toast.error('Ju lutem prisni derisa modeli të përfundojë përgjigjen e tij!');
             } else {
               submitForm();
             }

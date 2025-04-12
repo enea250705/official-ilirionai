@@ -24,10 +24,11 @@ export async function generateTitleFromUserMessage({
   const { text: title } = await generateText({
     model: myProvider.languageModel('title-model'),
     system: `\n
-    - you will generate a short title based on the first message a user begins a conversation with
-    - ensure it is not more than 80 characters long
-    - the title should be a summary of the user's message
-    - do not use quotes or colons`,
+    - ti duhet të gjenerosh një titull të shkurtër bazuar në mesazhin e parë me të cilin përdoruesi fillon një bisedë
+    - sigurohu që titulli të mos jetë më shumë se 80 karaktere
+    - titulli duhet të jetë një përmbledhje e mesazhit të përdoruesit
+    - mos përdor thonjëza ose dy pika
+    - gjeneroje titullin vetëm në gjuhën shqipe`,
     prompt: JSON.stringify(message),
   });
 
