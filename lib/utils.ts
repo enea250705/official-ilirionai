@@ -163,3 +163,17 @@ export function getTrailingMessageId({
 
   return trailingMessage.id;
 }
+
+export function getBaseUrl() {
+  if (typeof window !== 'undefined') {
+    // In the browser, use relative path
+    return '';
+  }
+  
+  // In Node.js (SSR) use the environment variable or fallback
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  
+  return 'http://localhost:3000';
+}

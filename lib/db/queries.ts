@@ -23,14 +23,24 @@ import { ArtifactKind } from '@/components/artifact';
 // use the Drizzle adapter for Auth.js / NextAuth
 // https://authjs.dev/reference/adapter/drizzle
 
-// biome-ignore lint: Forbidden non-null assertion.
-const client = postgres(process.env.POSTGRES_URL || '');
+// Get the database URL from environment variables
+const DATABASE_URL = process.env.POSTGRES_URL || process.env.DATABASE_URL || '';
+
+// Initialize database connection
+let client;
+try {
+  client = postgres(DATABASE_URL);
+} catch (error) {
+  console.error('Failed to initialize database client:', error);
+  throw new Error('Database connection failed');
+}
+
 const db = drizzle(client);
 
 export async function getUser(email: string): Promise<Array<User>> {
   try {
-    if (!process.env.POSTGRES_URL) {
-      console.error('POSTGRES_URL is not defined');
+    if (!DATABASE_URL) {
+      console.error('Database URL is not defined');
       return [];
     }
     return await db.select().from(user).where(eq(user.email, email));
@@ -42,8 +52,8 @@ export async function getUser(email: string): Promise<Array<User>> {
 
 export async function createUser(email: string, password: string) {
   try {
-    if (!process.env.POSTGRES_URL) {
-      console.error('POSTGRES_URL is not defined');
+    if (!DATABASE_URL) {
+      console.error('Database URL is not defined');
       throw new Error('Database connection not configured');
     }
     const salt = genSaltSync(10);
