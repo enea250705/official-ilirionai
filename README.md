@@ -40,7 +40,27 @@ This template ships with [xAI](https://x.ai) `grok-2-1212` as the default chat m
 
 ## Deploy Your Own
 
-You can deploy your own version of the Next.js AI Chatbot to Vercel with one click:
+### Netlify Deployment
+
+You can deploy this application to Netlify by following these steps:
+
+1. Push your code to a GitHub repository
+2. Sign in to [Netlify](https://netlify.com)
+3. Click "Add new site" > "Import an existing project"
+4. Connect to your GitHub repository
+5. Configure the following build settings:
+   - Build command: `npm run build`
+   - Publish directory: `.next`
+6. Add the required environment variables in the Netlify dashboard:
+   - `AUTH_SECRET`: Generate a random secret using `openssl rand -base64 32`
+   - Add other required environment variables from your `.env` file
+7. Deploy your site
+
+The repository already includes a `netlify.toml` configuration file for optimal deployment.
+
+### Vercel Deployment
+
+You can also deploy your own version of the Next.js AI Chatbot to Vercel with one click:
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fai-chatbot&env=AUTH_SECRET&envDescription=Generate%20a%20random%20secret%20to%20use%20for%20authentication&envLink=https%3A%2F%2Fgenerate-secret.vercel.app%2F32&project-name=my-awesome-chatbot&repository-name=my-awesome-chatbot&demo-title=AI%20Chatbot&demo-description=An%20Open-Source%20AI%20Chatbot%20Template%20Built%20With%20Next.js%20and%20the%20AI%20SDK%20by%20Vercel&demo-url=https%3A%2F%2Fchat.vercel.ai&products=%5B%7B%22type%22%3A%22integration%22%2C%22protocol%22%3A%22ai%22%2C%22productSlug%22%3A%22grok%22%2C%22integrationSlug%22%3A%22xai%22%7D%2C%7B%22type%22%3A%22integration%22%2C%22protocol%22%3A%22storage%22%2C%22productSlug%22%3A%22neon%22%2C%22integrationSlug%22%3A%22neon%22%7D%2C%7B%22type%22%3A%22blob%22%7D%5D)
 
